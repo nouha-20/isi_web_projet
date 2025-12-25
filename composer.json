@@ -1,0 +1,17 @@
+{
+    "name": "enouh/blog",
+    "autoload": {
+        "psr-4": {
+            "Enouh\\Blog\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nouha-20",
+            "email": "e.nouhameqdad@go.ugr.es"
+        }
+    ],
+    "require": {
+        "twig/twig": "^3.22"
+    }
+}

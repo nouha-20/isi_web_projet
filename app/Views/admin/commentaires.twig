@@ -1,0 +1,35 @@
+<h1>Commentaires en attente</h1>
+
+{% if commentaires is empty %}
+    <p>Aucun commentaire à modérer.</p>
+{% else %}
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Auteur</th>
+        <th>Contenu</th>
+        <th>Date</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for c in commentaires %}
+    <tr>
+        <td>{{ c.nom_auteur }}</td>
+        <td>{{ c.contenu }}</td>
+        <td>{{ c.date_commentaire }}</td>
+        <td>
+            <form method="POST" style="display:inline">
+                <input type="hidden" name="id" value="{{ c.id }}">
+                <input type="hidden" name="action" value="approve">
+                <button>Approuver</button>
+            </form>
+
+            <form method="POST" style="display:inline">
+                <input type="hidden" name="id" value="{{ c.id }}">
+                <input type="hidden" name="action" value="delete">
+                <button>Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
