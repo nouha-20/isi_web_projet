@@ -1,0 +1,141 @@
+{% extends "nav.twig" %}
+
+        {% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        {% if is_edit %}
+                        <i class="bi bi-pencil-square"></i> Modifier l'article
+                        {% else %}
+                        <i class="bi bi-plus-circle"></i> Rédiger un nouvel article
+                        {% endif %}
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    {# Affichage des erreurs PHP éventuelles #}
+                    {% if error %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <form method="POST"
+                          action="index.php?admin={% if is_edit %}edit_article&id={{ article.id }}{% else %}add_article{% endif %}"
+                          enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label for="titre" class="form-label fw-bold">Titre de l'article</label>
+                        <input type="text" class="form-control form-control-lg" id="titre" name="titre"
+                               value="{{ article.titre }}" placeholder="Ex: Ma randonnée dans les Alpes" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="statut" class="form-label fw-bold">Statut</label>
+                            <select class="form-select" id="statut" name="statut">
+                                <option value="Brouillon" {% if article.statut == 'Brouillon' %}selected{% endif %}>
+                                🟠 Brouillon (Invisible)
+                            </option>
+                            {% if session.user_role != 'Contributeur' %}
+                            <option value="Publié" {% if article.statut == 'Publié' %}selected{% endif %}>
+                            🟢 Publié (Visible)
+                        </option>
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="image" class="form-label fw-bold">Image à la une</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+
+                    {% if is_edit and article.image_une %}
+                    <div class="mt-2 p-2 border rounded bg-light d-flex align-items-center">
+                        <img src="uploads/{{ article.image_une }}" alt="Actuelle" style="height: 40px; width: 40px; object-fit: cover; margin-right: 10px;" class="rounded">
+                        <small class="text-muted">Image actuelle conservée si vide.</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Tags associés</label>
+                <div class="card p-3 bg-light border-0">
+                    <div class="row">
+                        {% for tag in tags %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="tags[]"
+                                       value="{{ tag.id }}"
+                                       id="tag_{{ tag.id }}"
+                                {% if is_edit and current_tags is defined and tag.id in current_tags %}checked{% endif %}>
+
+                                <label class="form-check-label" for="tag_{{ tag.id }}">
+                                    {{ tag.nom_tag }}
+                                </label>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="col-12 text-muted fst-italic">
+                            <i class="bi bi-exclamation-circle"></i> Aucun tag n'a été créé dans la base de données.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="contenu" class="form-label fw-bold">Contenu</label>
+                <textarea class="form-control" id="contenu" name="contenu" rows="12" placeholder="Écrivez le contenu de votre article ici...">{{ article.contenu }}</textarea>
+            </div>
+
+            <div class="d-flex justify-content-between pt-3 border-top">
+                <a href="index.php?admin=dashboard" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-save"></i>
+                    {% if is_edit %}Mettre à jour l'article{% else %}Enregistrer l'article{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+        </div>
+        </div>
+        </div>
+
+<script src="https://cdn.tiny.cloud/1/kykzrygc1n7zhrh9h3f7gkimbrd8e034saywnvhzihvijaa1/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+tinymce.init({
+    selector: '#contenu',
+    language: 'fr_FR', // Assurez-vous que la langue est supportée ou retirez cette ligne
+    height: 500,
+    menubar: false,
+    plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+        'bold italic backcolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+
+    // --- CORRECTIF IMPORTANT ---
+    // Cette fonction force la mise à jour du textarea caché dès qu'on tape du texte
+    setup: function (editor) {
+        editor.on('change', function () {
+            editor.save();
+        });
+    }
+});
+</script>
+
+        {% endblock %}

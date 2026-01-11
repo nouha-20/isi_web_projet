@@ -57,7 +57,6 @@ class Commentaire {
         }
     }
 
-    //  POUR L’ADMIN
     public static function getPending() {
         $conn = Database::getInstance();
         $stmt = $conn->query("

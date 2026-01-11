@@ -1,0 +1,73 @@
+{% extends "nav.twig" %}
+
+        {% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des Tags</h1>
+        <a href="index.php?admin=dashboard" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Ajouter un Tag</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="index.php?admin=save_tag">
+                        <div class="mb-3">
+                            <label class="form-label">Nom du Tag</label>
+                            <input type="text" name="nom_tag" class="form-control" placeholder="Ex: Sport, Cuisine..." required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Créer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Nom du Tag</th>
+                            <th>Articles liés</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for tag in tags %}
+                        <tr>
+                            <td>
+                                <form method="POST" action="index.php?admin=save_tag" class="d-flex gap-2">
+                                    <input type="hidden" name="id" value="{{ tag.id }}">
+                                    <input type="text" name="nom_tag" value="{{ tag.nom_tag }}" class="form-control form-control-sm">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Renommer">
+                                        <i class="bi bi-save"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ tag.count }}</span></td>
+                            <td class="text-end">
+                                <form method="POST" action="index.php?admin=delete_tag" onsubmit="return confirm('Supprimer ce tag ?');">
+                                    <input type="hidden" name="id" value="{{ tag.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center text-muted">Aucun tag trouvé.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        {% endblock %}

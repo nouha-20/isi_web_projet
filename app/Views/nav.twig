@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Projet Blog ISI - Polytech Lyon" />
+    <meta name="author" content="Ton Nom" />
+    <title>Blog | Polytech Lyon</title>
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0-beta1/medium/index.min.css">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <style>
+        /* Styles pour le mode dyslexique */
+        body.dyslexic-mode {
+            font-family: 'OpenDyslexic', sans-serif !important;
+        }
+        body.dyslexic-mode p, body.dyslexic-mode li {
+            line-height: 1.8 !important;
+            letter-spacing: 0.05em !important;
+        }
+
+        /* Ajustements UI */
+        .accessibility-btn {
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .accessibility-btn:hover { transform: scale(1.1); }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100"
+      x-data="{
+          theme: localStorage.getItem('theme') || 'light',
+          dyslexic: localStorage.getItem('dyslexic') === 'true',
+
+          init() {
+              // Appliquer le thème au chargement
+              document.documentElement.setAttribute('data-bs-theme', this.theme);
+
+              // Appliquer la police au chargement
+              if(this.dyslexic) document.body.classList.add('dyslexic-mode');
+
+              // Surveiller les changements de thème
+              this.$watch('theme', (val) => {
+                  localStorage.setItem('theme', val);
+                  document.documentElement.setAttribute('data-bs-theme', val);
+              });
+
+              // Surveiller les changements de dyslexie
+              this.$watch('dyslexic', (val) => {
+                  localStorage.setItem('dyslexic', val);
+                  document.body.classList.toggle('dyslexic-mode', val);
+              });
+          },
+
+          toggleTheme() {
+              this.theme = (this.theme === 'light' ? 'dark' : 'light');
+          }
+      }">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+    <div class="container px-5">
+        <a class="navbar-brand" href="index.php">Blog VTT</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
+
+                {% if session.user_role %}
+                <li class="nav-item"><a class="nav-link" href="index.php?admin=dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" href="index.php?action=logout">Déconnexion</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="index.php?action=login">Connexion</a></li>
+                {% endif %}
+
+                <li class="nav-item mx-2 border-end border-secondary d-none d-lg-block"></li>
+
+                <li class="nav-item d-flex align-items-center">
+                    <button class="accessibility-btn nav-link" @click="toggleTheme()" title="Changer le thème">
+                    <i class="bi" :class="theme === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                </button>
+            </li>
+
+            <li class="nav-item d-flex align-items-center">
+                <button class="accessibility-btn nav-link" @click="dyslexic = !dyslexic" title="Police Dyslexique">
+                <i class="bi bi-eye-fill" :class="dyslexic ? 'text-info' : ''"></i>
+            </button>
+        </li>
+    </ul>
+</div>
+</div>
+</nav>
+
+<main class="flex-shrink-0">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="bg-dark py-4 mt-auto">
+<div class="container px-5">
+    <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+        <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; ISI Web Projet 2025</div></div>
+
+    </div>
+</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>

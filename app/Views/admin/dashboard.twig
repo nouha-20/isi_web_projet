@@ -1,0 +1,203 @@
+{% extends "nav.twig" %}
+
+        {% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Tableau de Bord</h1>
+        <div class="text-end">
+            <span class="text-muted">Bonjour, {{ session.user_name }}</span>
+            <span class="badge bg-secondary ms-1">{{ session.user_role }}</span>
+            <a href="index.php?action=logout" class="btn btn-outline-danger btn-sm ms-2">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3 shadow">
+                <div class="card-header">Modération</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ nb_pending_comments }} Commentaire(s)</h5>
+                    <p class="card-text">En attente de validation.</p>
+                    <a href="index.php?admin=comments" class="btn btn-light btn-sm">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow">
+                <div class="card-header">Articles</div>
+                <div class="card-body">
+                    <h5 class="card-title">Gestion du Blog</h5>
+                    <p class="card-text">Rédiger ou éditer des articles.</p>
+                    <a href="index.php?admin=add_article" class="btn btn-light btn-sm">
+                        <i class="bi bi-pencil-square"></i> Rédiger un article
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if session.user_role == 'Administrateur' %}
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow">
+                <div class="card-header">Utilisateurs</div>
+                <div class="card-body">
+                    <h5 class="card-title">Gestion des accès</h5>
+                    <p class="card-text">Gérer les rôles et permissions.</p>
+                    <a href="index.php?admin=users" class="btn btn-light btn-sm">
+                        <i class="bi bi-people"></i> Gérer
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% if session.user_role == 'Administrateur' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Aperçu des Tags</h5>
+                    {% if session.user_role == 'Administrateur' %}
+                    <a href="index.php?admin=tags" class="btn btn-sm btn-light text-dark">
+                        <i class="bi bi-pencil-square"></i> Gérer les tags
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if tags is empty %}
+                    <p class="text-muted">Aucun tag défini.</p>
+                    {% else %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in tags %}
+                        <span class="badge bg-secondary p-2 fs-6">
+                                    {{ tag.nom_tag }}
+                                    <span class="badge bg-white text-dark ms-1 rounded-pill">{{ tag.count }}</span>
+                                </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Articles en attente de publication (Brouillons)</h5>
+                    <span class="badge bg-light text-dark">{{ nb_brouillons }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if brouillons is empty %}
+                    <div class="p-3 text-center text-muted">
+                        <i class="bi bi-check-circle"></i> Aucun article en attente. Tout est publié !
+                    </div>
+                    {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>Date de création</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for article in brouillons %}
+                            <tr>
+                                <td><strong>{{ article.titre }}</strong></td>
+                                <td><span class="badge bg-info text-dark">{{ article.nom_utilisateur }}</span></td>
+                                <td>{{ article.date_creation|date("d/m/Y H:i") }}</td>
+                                <td class="text-end">
+                                    <a href="index.php?admin=edit_article&id={{ article.id }}" class="btn btn-sm btn-primary me-1" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    {% if session.user_role != 'Contributeur' %}
+                                    <form method="POST" action="index.php?admin=publish_article" style="display:inline;">
+                                        <input type="hidden" name="id" value="{{ article.id }}">
+                                        <button type="submit" class="btn btn-sm btn-success me-1" title="Publier">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="index.php?admin=delete_article" style="display:inline;" onsubmit="return confirm('Supprimer définitivement ce brouillon ?');">
+                                        <input type="hidden" name="id" value="{{ article.id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Articles Publiés (En ligne)</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if publies is empty %}
+                    <div class="p-3 text-center text-muted">
+                        Aucun article publié pour le moment.
+                    </div>
+                    {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>Date de publication</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for article in publies %}
+                            <tr>
+                                <td><strong>{{ article.titre }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ article.nom_utilisateur }}</span></td>
+                                <td>{{ article.date_creation|date("d/m/Y") }}</td>
+                                <td class="text-end">
+                                    <a href="index.php?id={{ article.id }}" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="Voir en ligne">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="index.php?admin=edit_article&id={{ article.id }}" class="btn btn-sm btn-primary me-1" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    {% if session.user_role != 'Contributeur' %}
+                                    <form method="POST" action="index.php?admin=delete_article" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article publié ?');">
+                                        <input type="hidden" name="id" value="{{ article.id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+        {% endblock %}

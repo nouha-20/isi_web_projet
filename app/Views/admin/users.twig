@@ -1,0 +1,68 @@
+{% extends "nav.twig" %}
+
+        {% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des Utilisateurs</h1>
+        <a href="index.php?admin=dashboard" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour au Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Nom d'utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôles</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr {% if user.id == session.user_id %}class="table-warning"{% endif %}>
+                    <td>
+                        <strong>{{ user.nom_utilisateur }}</strong>
+                        {% if user.id == session.user_id %}
+                        <span class="badge bg-primary ms-1">Vous</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ user.email }}</td>
+
+                    <td>
+                        {% if user.nom_role %}
+                        <span class="badge bg-info text-dark">{{ user.nom_role }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Aucun rôle</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-end">
+                        <a href="index.php?admin=edit_user&id={{ user.id }}" class="btn btn-sm btn-primary me-1" title="Modifier les rôles">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+
+                        {% if user.id != session.user_id %}
+                        <form method="POST" action="index.php?admin=delete_user" style="display:inline;" onsubmit="return confirm('Attention ! Supprimer cet utilisateur supprimera aussi ses articles et commentaires. Continuer ?');">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer le compte">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <span style="display:inline-block; width: 32px;"></span>
+                        {% endif %}
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        </div>
+        {% endblock %}

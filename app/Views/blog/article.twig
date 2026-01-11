@@ -1,0 +1,101 @@
+{% extends "nav.twig" %}
+
+        {% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <article class="mb-5">
+            <h1 class="fw-bolder mb-1">{{ article.titre }}</h1>
+
+            <div class="text-muted fst-italic mb-2">
+                Publié le {{ article.date_creation|date("d/m/Y") }}
+                par <strong>{{ article.nom_utilisateur }}</strong>
+            </div>
+
+            <div class="mb-3">
+                {% if article.statut == 'Brouillon' %}
+                <span class="badge bg-warning text-dark me-1">Brouillon</span>
+                {% endif %}
+
+                {% for tag in tags %}
+                <span class="badge bg-secondary me-1">
+                        <i class="bi bi-tag-fill"></i> {{ tag.nom_tag }}
+                    </span>
+                {% endfor %}
+            </div>
+
+            {% if article.image_une %}
+            <figure class="mb-4 mt-3">
+                <img class="img-fluid rounded shadow" src="uploads/{{ article.image_une }}" alt="{{ article.titre }}" style="width: 100%; object-fit: cover;">
+            </figure>
+            {% endif %}
+
+            <section class="mb-5">
+                <div class="fs-5 mb-4 article-content">
+                    {{ article.contenu|raw }}
+                </div>
+            </section>
+        </article>
+
+        <hr>
+
+        <section class="mb-5">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="card-title mb-4"><i class="bi bi-chat-text"></i> Laisser un commentaire</h5>
+                    <form method="POST" action="index.php?action=add_comment" class="mb-5">
+                        <input type="hidden" name="article_id" value="{{ article.id }}">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="nom_auteur" class="form-control" placeholder="Votre nom" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" name="email_auteur" class="form-control" placeholder="Votre email (optionnel)">
+                            </div>
+                            <div class="col-12">
+                                <textarea name="contenu" class="form-control" rows="3" placeholder="Votre message..." required></textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    Envoyer <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <h5 class="mb-3 border-bottom pb-2">Commentaires ({{ commentaires|length }})</h5>
+
+                    {% for comment in commentaires %}
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="rounded-circle shadow-sm" src="https://ui-avatars.com/api/?name={{ comment.nom_auteur }}&background=random&color=fff" alt="{{ comment.nom_auteur }}" width="50" height="50">
+                        </div>
+                        <div class="ms-3 w-100">
+                            <div class="fw-bold">{{ comment.nom_auteur }}</div>
+                            <span class="text-muted small">{{ comment.date_commentaire|date("d/m/Y à H:i") }}</span>
+                            <div class="mt-1 p-2 bg-white rounded border">
+                                {{ comment.contenu|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-chat-square-dots" style="font-size: 2rem;"></i><br>
+                        Soyez le premier à commenter cet article !
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-5 text-center">
+            <a href="index.php" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+</div>
+        {% endblock %}

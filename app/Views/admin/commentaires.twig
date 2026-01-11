@@ -1,35 +1,70 @@
-<h1>Commentaires en attente</h1>
+{% extends "nav.twig" %}
 
-{% if commentaires is empty %}
-    <p>Aucun commentaire à modérer.</p>
-{% else %}
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Auteur</th>
-        <th>Contenu</th>
-        <th>Date</th>
-        <th>Actions</th>
-    </tr>
+        {% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Modération des commentaires</h1>
+        <a href="index.php?admin=dashboard" class="btn btn-secondary btn-sm">Retour au Dashboard</a>
+    </div>
 
-    {% for c in commentaires %}
-    <tr>
-        <td>{{ c.nom_auteur }}</td>
-        <td>{{ c.contenu }}</td>
-        <td>{{ c.date_commentaire }}</td>
-        <td>
-            <form method="POST" style="display:inline">
-                <input type="hidden" name="id" value="{{ c.id }}">
-                <input type="hidden" name="action" value="approve">
-                <button>Approuver</button>
-            </form>
+    {% if commentaires is empty %}
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i> Aucun commentaire à modérer pour le moment.
+    </div>
+    {% else %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Auteur</th>
+                        <th>Contenu</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for c in commentaires %}
+                    <tr>
+                        <td>
+                            <strong>{{ c.nom_auteur }}</strong><br>
+                            <small class="text-muted">{{ c.email_auteur }}</small>
+                        </td>
+                        <td>{{ c.contenu }}</td>
+                        <td>{{ c.date_commentaire|date("d/m/Y H:i") }}</td>
+                        <td class="text-end">
+                            <form method="POST" style="display:inline">
+                                <input type="hidden" name="id" value="{{ c.id }}">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Approuver
+                                </button>
+                            </form>
 
-            <form method="POST" style="display:inline">
-                <input type="hidden" name="id" value="{{ c.id }}">
-                <input type="hidden" name="action" value="delete">
-                <button>Supprimer</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+                            <form method="POST" style="display:inline">
+                                <input type="hidden" name="id" value="{{ c.id }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    Rejeter
+                                </button>
+                            </form>
+
+                            <form method="POST" style="display:inline">
+                                <input type="hidden" name="id" value="{{ c.id }}">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce commentaire ?');">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+        {% endblock %}
